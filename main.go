@@ -16,10 +16,10 @@ import (
 
 // Bitfield configuration mode constants
 const (
-	ENABLE_SYBOLSNFILES   = 1
-	ENABLE_XREFS          = 2
-	ENABLE_MAINTAINERS    = 4
-	ENABLE_VERSION_CONFIG = 8
+	enableSymbolsFiles  = 1
+	enableXrefs         = 2
+	enableMaintainers   = 4
+	enableVersionConfig = 8
 )
 
 func main() {
@@ -33,24 +33,24 @@ func main() {
 	var addr2line_prefix string = ""
 	var wl *Workload
 
-	conf, err := args_parse(cmd_line_item_init())
+	conf, err := argsParse(cmdLineItemInit())
 	if err != nil {
 		fmt.Println("Kernel symbol fetcher")
-		print_help(cmd_line_item_init())
+		printHelp(cmdLineItemInit())
 		os.Exit(-1)
 	}
 	fmt.Println("create stripped version")
 	strip(conf.StripBin, conf.LinuxWDebug, conf.LinuxWODebug)
-	t := Connect_token{conf.DBURL, conf.DBPort, conf.DBUser, conf.DBPassword, conf.DBTargetDB}
+	t := Connect_token{conf.DBURL, conf.DBUser, conf.DBPassword, conf.DBTargetDB, conf.DBPort}
 	context := A2L_resolver__init(conf.LinuxWDebug, Connect_db(&t), false)
-	if conf.Mode&(ENABLE_VERSION_CONFIG) != 0 {
-		config, _ := get_FromFile(conf.KConfig_fn)
+	if conf.Mode&(enableVersionConfig) != 0 {
+		config, _ := get_FromFile(conf.KConfigFn)
 		makefile, _ := get_FromFile(conf.KMakefile)
 		v, err := get_version(makefile)
 		if err != nil {
 			panic(err)
 		}
-		wl = &Workload{Workload_type: GENERATE_QUERY, Query_args: Insert_Instance_Args{v.Version, v.Patchlevel, v.Sublevel, v.Extraversion, conf.Note}}
+		wl = &Workload{Workload_type: GENERATE_QUERY, Query_args: Insert_Instance_Args{v.Extraversion, conf.Note, v.Version, v.Patchlevel, v.Sublevel}}
 		query_mgmt(context, wl)
 		id = Insert_datawID(context, (*wl).Query_str)
 		kconfig := parse_config(config)
@@ -66,7 +66,7 @@ func main() {
 		bar.Finish()
 	}
 
-	if conf.Mode&(ENABLE_SYBOLSNFILES|ENABLE_XREFS) != 0 {
+	if conf.Mode&(enableSymbolsFiles|enableXrefs) != 0 {
 		r2p, err = r2.NewPipe(conf.LinuxWODebug)
 		if err != nil {
 			panic(err)
@@ -83,7 +83,7 @@ func main() {
 		funcs_data = get_all_funcdata(r2p)
 	}
 
-	if conf.Mode&ENABLE_SYBOLSNFILES != 0 {
+	if conf.Mode&enableSymbolsFiles != 0 {
 		count = len(funcs_data)
 		bar = pb.StartNew(count)
 
@@ -123,7 +123,7 @@ func main() {
 		}
 		bar.Finish()
 	}
-	if conf.Mode&ENABLE_XREFS != 0 {
+	if conf.Mode&enableXrefs != 0 {
 		fmt.Println("Collecting indrcalls")
 		indcl := get_indirect_calls(r2p, funcs_data)
 		fmt.Println("Collecting xref")
@@ -146,15 +146,15 @@ func main() {
 	(*wl).Workload_type = GENERATE_QUERY
 	(*wl).Query_args = Insert_Tags_Args{addr2line_prefix}
 	query_mgmt(context, wl)
-	if conf.Mode&ENABLE_MAINTAINERS != 0 {
+	if conf.Mode&enableMaintainers != 0 {
 		fmt.Println("Collecting tags")
-		s, err := get_FromFile(conf.Maintainers_fn)
+		s, err := get_FromFile(conf.MaintainersFn)
 		if err != nil {
 			panic(err)
 		}
 		ss := s[seek2data(s):]
 		items := parse_maintainers(ss)
-		queries := generate_queries(conf.Maintainers_fn, items, (*wl).Query_str, id)
+		queries := generate_queries(conf.MaintainersFn, items, (*wl).Query_str, id)
 		bar = pb.StartNew(len(queries))
 		(*wl).Workload_type = EXECUTE_QUERY_ONLY
 		for _, q := range queries {

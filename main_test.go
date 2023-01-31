@@ -190,23 +190,23 @@ func TestMaintainer(t *testing.T) {
 // Tests the ability to extract the configuration from command line arguments
 func TestConfig(t *testing.T) {
 	var Default_config configuration = configuration{
-		LinuxWDebug:    "vmlinux",
-		LinuxWODebug:   "vmlinux.work",
-		StripBin:       "/usr/bin/strip",
-		DBURL:          "dbs.hqhome163.com",
-		DBPort:         5432,
-		DBUser:         "alessandro",
-		DBPassword:     "<password>",
-		DBTargetDB:     "kernel_bin",
-		Maintainers_fn: "MAINTAINERS",
-		KConfig_fn:     "include/generated/autoconf.h",
-		KMakefile:      "Makefile",
-		Mode:           15,
-		Note:           "upstream",
+		LinuxWDebug:   "vmlinux",
+		LinuxWODebug:  "vmlinux.work",
+		StripBin:      "/usr/bin/strip",
+		DBURL:         "dbs.hqhome163.com",
+		DBPort:        5432,
+		DBUser:        "alessandro",
+		DBPassword:    "<password>",
+		DBTargetDB:    "kernel_bin",
+		MaintainersFn: "MAINTAINERS",
+		KConfigFn:     "include/generated/autoconf.h",
+		KMakefile:     "Makefile",
+		Mode:          15,
+		Note:          "upstream",
 	}
 
 	os.Args = []string{"kern_bin_db"}
-	conf, err := args_parse(cmd_line_item_init())
+	conf, err := argsParse(cmdLineItemInit())
 	if err != nil {
 		t.Error("Error validating empty command line input")
 	}
@@ -214,14 +214,14 @@ func TestConfig(t *testing.T) {
 		t.Error("Error parsing empty command line input")
 	}
 	os.Args = []string{"kern_bin_db", "-f"}
-	conf, err = args_parse(cmd_line_item_init())
+	conf, err = argsParse(cmdLineItemInit())
 	if err == nil {
 		t.Error("error cmd line not detected", conf)
 	}
 	_, filename, _, _ := runtime.Caller(0)
 	current := filepath.Dir(filename)
 	os.Args = []string{"kern_bin_db", "-f", current + "/t_files/test1.json"}
-	conf, err = args_parse(cmd_line_item_init())
+	conf, err = argsParse(cmdLineItemInit())
 	if err != nil {
 		t.Error("error loading sample test configuration 1", err)
 	}
@@ -232,37 +232,35 @@ func TestConfig(t *testing.T) {
 		t.Error("Error parsing sample test configuration 1", conf)
 	}
 	os.Args = []string{"kern_bin_db", "-s", "None1"}
-	conf, err = args_parse(cmd_line_item_init())
+	conf, err = argsParse(cmdLineItemInit())
 	if conf.StripBin != "None1" {
 		t.Error("Error parsing strip binary arg")
 	}
 	os.Args = []string{"kern_bin_db", "-u", "None2"}
-	conf, err = args_parse(cmd_line_item_init())
+	conf, err = argsParse(cmdLineItemInit())
 	if conf.DBUser != "None2" {
 		t.Error("Error parsing database userid arg")
 	}
 	os.Args = []string{"kern_bin_db", "-p", "None3"}
-	conf, err = args_parse(cmd_line_item_init())
+	conf, err = argsParse(cmdLineItemInit())
 	if conf.DBPassword != "None3" {
 		t.Error("Error parsing password arg")
 	}
 	os.Args = []string{"kern_bin_db", "-d", "None4"}
-	conf, err = args_parse(cmd_line_item_init())
+	conf, err = argsParse(cmdLineItemInit())
 	if conf.DBURL != "None4" {
 		t.Error("Error parsing db url arg")
 	}
 	os.Args = []string{"kern_bin_db", "-o", "1234"}
-	conf, err = args_parse(cmd_line_item_init())
+	conf, err = argsParse(cmdLineItemInit())
 	if conf.DBPort != 1234 {
 		t.Error("Error parsing db port arg")
 	}
 }
 
-
-
 // Tests the ability to remove duplicates xrefs from the xref list
 func TestRemoveDuplicate(t *testing.T) {
- 	xref_test1 := []xref{ //should find no duplicates
+	xref_test1 := []xref{ //should find no duplicates
 		xref{"indirect", 0xffffffff826a98a7, 0}, xref{"indirect", 0xffffffff826a98ef, 0}, xref{"indirect", 0xffffffff826ab514, 0}, xref{"indirect", 0xffffffff826ab5f3, 0},
 		xref{"direct", 0xffffffff82681b9a, 0xffffffff826831c4}, xref{"direct", 0xffffffff8268214a, 0xffffffff82685b2a}, xref{"direct", 0xffffffff8268215a, 0xffffffff826878ab}, xref{"direct", 0xffffffff8268226a, 0xffffffff82687591},
 		xref{"direct", 0xffffffff826822aa, 0xffffffff82685dc1}, xref{"direct", 0xffffffff8268245b, 0xffffffff826826aa}, xref{"direct", 0xffffffff8268255b, 0xffffffff826833a5}, xref{"direct", 0xffffffff8268259b, 0xffffffff82680329},
@@ -306,12 +304,12 @@ func TestRemoveDuplicate(t *testing.T) {
 	}
 
 	res := removeDuplicate(xref_test1)
-	if len(xref_test1)!=len(res){
+	if len(xref_test1) != len(res) {
 		t.Error("Expect to find no duplicates. Test failed.")
 	}
 
 	res = removeDuplicate(xref_test2)
-	if len(xref_test2)-2!=len(res){
+	if len(xref_test2)-2 != len(res) {
 		t.Error("Expect to find duplicates. Test failed.")
 	}
 }

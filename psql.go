@@ -14,18 +14,18 @@ import (
 // Sql connection configuration
 type Connect_token struct {
 	Host   string
-	Port   int
 	User   string
 	Pass   string
 	Dbname string
+	Port   int
 }
 
 type Insert_Instance_Args struct {
+	Extraversion string
+	Note         string
 	Version      int64
 	Patchlevel   int64
 	Sublevel     int64
-	Extraversion string
-	Note         string
 }
 
 type Insert_Config_Args struct {
@@ -44,18 +44,18 @@ type Insert_Tags_Ind_Args struct {
 }
 
 type Insert_Symbols_Files_Args struct {
-	Id            int
 	Symbol_Name   string
 	Symbol_Offset string
 	Symbol_Type   string
+	Id            int
 }
 
 type Insert_Xrefs_Args struct {
+	Source_line    string
 	Caller_Offset  uint64
 	Calling_Offset uint64
 	Callee_Offset  uint64
 	Id             int
-	Source_line    string
 }
 
 type Insert_Tags_Args struct {
