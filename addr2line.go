@@ -39,10 +39,10 @@ const (
 )
 
 type Workload struct {
-	Addr2ln_offset uint64
+	Query_args     interface{}
 	Addr2ln_name   string
 	Query_str      string
-	Query_args     interface{}
+	Addr2ln_offset uint64
 	Workload_type  Workload_Type
 }
 
@@ -50,14 +50,14 @@ type Workload struct {
 type Context struct {
 	a2l         *addr2line.Addr2line
 	ch_workload chan Workload
-	mu          sync.Mutex
 	DB          *sql.DB
+	mu          sync.Mutex
 }
 
 // Caches item elements
 type Addr2line_items struct {
-	Addr      uint64
 	File_name string
+	Addr      uint64
 }
 
 // Commandline handle functions prototype

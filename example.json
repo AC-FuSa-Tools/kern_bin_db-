@@ -7,8 +7,8 @@
 "DBUser":		"alessandro",
 "DBPassword":		"<password>",
 "DBTargetDB":		"kernel_bin",
-"Maintainers_fn":	"MAINTAINERS",
-"KConfig_fn":		"include/generated/autoconf.h",
+"MaintainersFn":	"MAINTAINERS",
+"KConfigFn":		"include/generated/autoconf.h",
 "KMakefile":		"Makefile",
 "Mode":			15,
 "Note":			"upstream"

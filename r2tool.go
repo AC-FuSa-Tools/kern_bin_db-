@@ -18,8 +18,8 @@ import (
 )
 
 type sysc struct {
-	Addr uint64
 	Name string
+	Addr uint64
 }
 
 type res struct {
@@ -33,52 +33,52 @@ type reloc_data struct {
 	Demname  string `json: "demname"`
 	Type     string `json: "type"`
 	Vaddr    uint64 `json: "vaddr"`
-	Paddr    uint32 `json: "paddr"`
 	Sym_va   uint64 `json: "sym_va"`
+	Paddr    uint32 `json: "paddr"`
 	is_ifunc bool   `json: "is_ifunc"`
 }
 
 // radare 2 datatype representing a function object
 type func_data struct {
-	Offset     uint64       `json:"offset"`
-	Name       string       `json: "name"`
-	Size       uint64       `json: "size"`
-	Is_pure    string       `json: "is-pure"`
-	Realsz     uint64       `json: "realsz"`
-	Noreturn   bool         `json: "noreturn"`
-	Stackframe uint16       `json: "stackframe"`
 	Calltype   string       `json: "calltype"`
-	Cost       uint16       `json: "cost"`
-	Cc         uint16       `json: "cc"`
-	Bits       uint16       `json: "bits"`
-	Type       string       `json: "type"`
-	Nbbs       uint16       `json: "nbbs"`
-	Is_lineal  bool         `json: "is-lineal"`
-	Ninstrs    uint16       `json: "ninstrs"`
-	Edges      uint16       `json: "edges"`
-	Ebbs       uint16       `json: "ebbs"`
+	Name       string       `json: "name"`
 	Signature  string       `json: "signature"`
+	Is_pure    string       `json: "is-pure"`
+	Type       string       `json: "type"`
+	Difftype   string       `json: "difftype"`
+	Codexrefs  []ref_       `json: "codexrefs"`
+	Regvars    []reg_var_   `json: "regvars"`
+	Spvars     []stack_var_ `json: "spvars"`
+	Bpvars     []stack_var_ `json: "bpvars"`
+	Dataxrefs  []uint64     `json: "dataxrefs"`
+	Datarefs   []uint64     `json: "datarefs"`
+	Callrefs   []ref_       `json: "callrefs"`
+	Realsz     uint64       `json: "realsz"`
 	Minbound   uint64       `json: "minbound"`
 	Maxbound   uint64       `json: "maxbound"`
-	Callrefs   []ref_       `json: "callrefs"`
-	Datarefs   []uint64     `json: "datarefs"`
-	Codexrefs  []ref_       `json: "codexrefs"`
-	Dataxrefs  []uint64     `json: "dataxrefs"`
-	Indegree   uint16       `json: "indegree"`
+	Offset     uint64       `json:"offset"`
+	Size       uint64       `json: "size"`
+	Ebbs       uint16       `json: "ebbs"`
 	Outdegree  uint16       `json: "outdegree"`
+	Ninstrs    uint16       `json: "ninstrs"`
+	Stackframe uint16       `json: "stackframe"`
+	Nbbs       uint16       `json: "nbbs"`
+	Bits       uint16       `json: "bits"`
+	Indegree   uint16       `json: "indegree"`
+	Edges      uint16       `json: "edges"`
 	Nlocals    uint16       `json: "nlocals"`
 	Nargs      uint16       `json: "nargs"`
-	Bpvars     []stack_var_ `json: "bpvars"`
-	Spvars     []stack_var_ `json: "spvars"`
-	Regvars    []reg_var_   `json: "regvars"`
-	Difftype   string       `json: "difftype"`
+	Cc         uint16       `json: "cc"`
+	Cost       uint16       `json: "cost"`
+	Is_lineal  bool         `json: "is-lineal"`
+	Noreturn   bool         `json: "noreturn"`
 	Indirect   bool
 }
 
 // radare 2 datatype representing a reference object (e.g., xref, callref, and dataref)
 type ref_ struct {
-	Addr uint64 `json: "addr"`
 	Type string `json: "type"`
+	Addr uint64 `json: "addr"`
 	At   uint64 `json: "at"`
 }
 
@@ -111,18 +111,18 @@ type xref struct {
 }
 
 type xref_cache struct {
-	Addr uint64
 	Xr   []xref
+	Addr uint64
 }
 
 type fref struct {
-	Addr uint64
 	Name string
+	Addr uint64
 }
 type results struct {
-	Addr uint64
 	Name string
 	Path []fref
+	Addr uint64
 }
 
 // radare 2 datatype representing a code block object
@@ -145,10 +145,10 @@ type bloc struct {
 // radare 2 datatype representing a binary info detail
 type bin_info struct {
 	Arch     string `json: "arch"`
-	Bits     int    `json: "bits"`
 	Compiler string `json: "compiler"`
 	Endian   string `json: "endian"`
 	Machine  string `json: "machine"`
+	Bits     int    `json: "bits"`
 }
 
 // radare 2 datatype representing a binary info detail
@@ -265,7 +265,7 @@ func Getxrefs(r2p *r2.Pipe, current uint64, indcall []uint64, funcs []func_data,
 		}
 	}
 
-	*cache = append(*cache, xref_cache{current, xrefs})
+	*cache = append(*cache, xref_cache{xrefs, current})
 	return xrefs
 }
 
